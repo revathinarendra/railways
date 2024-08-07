@@ -78,7 +78,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'railwaybackend.wsgi.application'
 AUTH_USER_MODEL = 'auth.User'
-FRONTEND_URL = 'https://www.wikitube.io/'
+FRONTEND_URL = 'https://irctc-pi.vercel.app'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
@@ -144,7 +144,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'public/static')
 # media files configuration
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
+CORS_ALLOWED_ORIGINS = [
+    'https://railways-three.vercel.app',
+    'https://irctc-pi.vercel.app',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+]
 
 AUTHENTICATION_BACKENDS = [
     'backends.custom_auth_backend.CustomEmailBackend',  # Custom authentication backend

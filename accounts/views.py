@@ -13,6 +13,35 @@ from django.contrib.auth.models import User
 from .serializer import SignUpSerializer, UserSerializer, PasswordResetRequestSerializer, PasswordResetSerializer
 from .models import EmailVerificationToken
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth import authenticate, login
+
+
+
+@api_view(['POST'])
+def login_view(request):
+    """
+    Handle user login by authenticating the user and returning a token.
+    """
+    email = request.data.get('email')
+    password = request.data.get('password')
+    
+    if not email or not password:
+        return Response({'error': 'Email and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    user = authenticate(email=email, password=password)
+    
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+            serializer = UserSerializer(user)
+            return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Account is inactive.'}, status=status.HTTP_403_FORBIDDEN)
+    else:
+        return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
 
 @api_view(['POST'])
 def register(request):
@@ -56,7 +85,7 @@ def verify_email(request, token):
     user.is_active = True
     user.save()
     token_obj.delete()  # Optionally delete the token once used
-    return redirect('https://irctc-pi.vercel.app/login')  # Redirect to your login page or appropriate URL
+    return redirect('https://irctc-pi.vercel.app')  # Redirect to your login page or appropriate URL
 
 @api_view(['GET'])
 def currentUser(request):
