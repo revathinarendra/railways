@@ -7,11 +7,11 @@ from django.contrib.auth.tokens import default_token_generator
 
 class SignUpSerializer(serializers.ModelSerializer):
     date_of_birth = serializers.DateField(required=True)
-    # Removed gender since it's not in UserProfile anymore
+    gender = serializers.ChoiceField(choices=UserProfile.GENDER_CHOICES, required=True)
 
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'email', 'password', 'date_of_birth')
+        fields = ('first_name', 'last_name', 'email', 'password', 'date_of_birth', 'gender')
         extra_kwargs = {
             'first_name': {'required': True, 'allow_blank': False},
             'last_name': {'required': True, 'allow_blank': False},
@@ -21,6 +21,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         date_of_birth = validated_data.pop('date_of_birth')
+        gender = validated_data.pop('gender')
         email = validated_data['email']
         user = User.objects.create_user(
             username=email,
@@ -30,13 +31,13 @@ class SignUpSerializer(serializers.ModelSerializer):
             last_name=validated_data['last_name'],
             is_active=False  # User is not active until email is verified
         )
-        UserProfile.objects.create(user=user, date_of_birth=date_of_birth)
+        UserProfile.objects.create(user=user, date_of_birth=date_of_birth, gender=gender)
         return user
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ('date_of_birth', 'phone_number', 'first_name', 'last_name', 'email')  # Adjust based on your model
+        fields = ('date_of_birth', 'phone_number', 'first_name', 'last_name', 'email', 'gender')
 
 class UserSerializer(serializers.ModelSerializer):
     userprofile = UserProfileSerializer()

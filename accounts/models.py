@@ -4,13 +4,19 @@ from django.utils import timezone
 import uuid
 
 class UserProfile(models.Model):
+    GENDER_CHOICES = [
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Other'),
+    ]
+    
     user = models.OneToOneField(User, related_name='userprofile', on_delete=models.CASCADE)
-    date_of_birth = models.DateField(null=True, blank=True,auto_now_add=True)
+    date_of_birth = models.DateField(null=True, blank=True)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
     first_name = models.CharField(max_length=30, null=True, blank=True)
     last_name = models.CharField(max_length=30, null=True, blank=True)
     email = models.EmailField(max_length=254, null=True, blank=True)
-    password = models.CharField(max_length=128, null=True, blank=True)  # Note: Storing plain passwords is not secure.
+    password = models.CharField(max_length=128, null=True, blank=True)  
 
     # Additional fields
     date_joined = models.DateTimeField(auto_now_add=True)
@@ -20,13 +26,16 @@ class UserProfile(models.Model):
     is_active = models.BooleanField(default=True)
     is_superadmin = models.BooleanField(default=False)
 
+    # New field
+    gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
+
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.email})"
 
     @property
     def is_profile_complete(self):
         return all([self.first_name, self.last_name, self.email, self.phone_number])
-
+    
 class EmailVerificationToken(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     token = models.UUIDField(default=uuid.uuid4, editable=False)

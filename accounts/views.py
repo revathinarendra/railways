@@ -56,7 +56,7 @@ def verify_email(request, token):
     user.is_active = True
     user.save()
     token_obj.delete()  # Optionally delete the token once used
-    return redirect('https://www.wikitube.io/login')  # Redirect to your login page or appropriate URL
+    return redirect('https://irctc-pi.vercel.app/login')  # Redirect to your login page or appropriate URL
 
 @api_view(['GET'])
 def currentUser(request):
@@ -86,6 +86,7 @@ def updateUser(request):
     # Ensure UserProfile model has fields to update
     user_profile = user.userprofile
     user_profile.date_of_birth = data.get('date_of_birth', user_profile.date_of_birth)
+    user_profile.gender = data.get('gender', user_profile.gender)  # Update gender
     user_profile.save()
 
     serializer = UserSerializer(user)
